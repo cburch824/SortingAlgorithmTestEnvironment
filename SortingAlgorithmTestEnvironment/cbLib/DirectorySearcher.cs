@@ -64,7 +64,7 @@ namespace cbLibrary
 
             string fileType = inputFileName.Remove(0, indexOfLastPeriod + 1); //we are removing indexOfLastPeriod + 1 because we also want to remove the period
 
-            return fileType; //Test Status: Tested once, working
+            return fileType; //Test Status: Tested and working
 
         }
 

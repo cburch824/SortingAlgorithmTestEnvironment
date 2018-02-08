@@ -35,7 +35,7 @@ namespace SortingAlgorithmTestEnvironment
             inputString = inputString.Trim();  //removing leading and trailing spaces avoids regex errors
             string[] numberArray = removeSpaces.Split(inputString);
 
-            int[] intArray = new int[5];
+            int[] intArray = new int[numberArray.Length];
 
             for(int i = 0; i < numberArray.Length; i++)
             {
@@ -75,20 +75,26 @@ namespace SortingAlgorithmTestEnvironment
 
         }//close btnSort_Click
 
+
+        //Generate a randomized list of ints in a textfile of size n
         private void button1_Click(object sender, EventArgs e)
         {
+
+            int n = validateGenerateIntsInput(txtNumberOfGeneratedInts.Text);
+            if (n <= 0) //if the validation fails, then focus the input textbox
+                txtNumberOfGeneratedInts.Focus();
+
             //Generate and shuffle list of n integers
-            int n = 10000000;
             Random rng = new Random();
 
-                    //generate
+                //Generate list
             List<int> intList = new List<int>(n);
             for(int i = 1; i < n + 1; i++)
             {
                 intList.Add(i);
             }
 
-            //Fisher-Yates shuffle
+                //Fisher-Yates shuffle
             int j = intList.Count;
             while( j > 1)
             {
@@ -108,11 +114,36 @@ namespace SortingAlgorithmTestEnvironment
             {
                 intFileWriter.WriteLine(val.ToString());
             }
-            
+
+            //close stream and dispose of Filestream object
             intFileWriter.Close();
-            //close stream
             intFile.Dispose();
 
+        }
+
+        //Validate user input for "Generate Int Textfile" textbox
+        private int validateGenerateIntsInput(string inputString)
+        {
+            int outputValue = -1; //initialized to an invalid value so it can be returned later
+            try
+            {
+
+                outputValue = int.Parse(inputString);
+
+                //Prompt the user with an error message if n is less than or equal to zero.
+                if (outputValue <= 0)
+                {
+                    MessageBox.Show("The number of generated ints must be a positive integer."); //Prompt the user with an error message if n is less than or equal to zero.
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                outputValue = -1; //error value
+            }
+
+            return outputValue;
         }
 
         //Retrieve list of ints from file, delimited by newline
@@ -157,7 +188,6 @@ namespace SortingAlgorithmTestEnvironment
             int nValue = 10;
             List<int> intList = GetListIntFromFile("sortInt" + nValue.ToString() + ".txt");
             int[] intArray = ConvertListOfIntsToArrayOfInts(intList);
-            int[] sortedIntArray;
             Stopwatch sortingTimer = new Stopwatch();
 
             //Initalize the sorting algorithms
@@ -185,11 +215,7 @@ namespace SortingAlgorithmTestEnvironment
 
             //Initalize required components
             double maxNValue = Math.Pow(10, 5);
-            //int nValue = 10;
-            //List<int> intList = GetListIntFromFile("sortInt" + nValue.ToString() + ".txt"); //imports a list of ints
             List<int[]> listIntArray = new List<int[]>();
-            //int[] intArray = ConvertListOfIntsToArrayOfInts(intList);
-            //int[] sortedIntArray;
             Stopwatch sortingTimer = new Stopwatch();
 
             //Initalize the sorting algorithms
@@ -252,6 +278,70 @@ namespace SortingAlgorithmTestEnvironment
             }
             
         }
+
+        private void btnSortAllIntLists_Click(object sender, EventArgs e)
+        {
+            //Find all of the int lists in the IntLists directory
+            string intListDirectory = Directory.GetCurrentDirectory() + "\\IntLists\\";
+            Debug.WriteLine(intListDirectory);
+            List<string> intFileList = new List<string>();
+            intFileList = cbLibrary.DirectorySearcher.ReturnFileNames(intListDirectory, "txt");
+
+            //Initalize required components
+            double maxNValue = Math.Pow(10, 5);
+            List<int[]> listIntArray = new List<int[]>();
+            Stopwatch sortingTimer = new Stopwatch();
+
+            //Initalize the sorting algorithms
+            SortingAlgorithmSelectSort selectSort = new SortingAlgorithmSelectSort("Select Sort");
+            TimeSpan selectSortTime = new TimeSpan();
+
+            //Sort all of the lists
+            foreach (string currentIntList in intFileList)
+            {
+                Debug.WriteLine(currentIntList);
+
+                //Get a list of ints from the current text file location
+                Debug.WriteLine("Getting list...");
+                List<int> intList = new List<int>();
+                intList = GetListIntFromFile(currentIntList);
+
+                //Convert that list to an array of ints
+                Debug.WriteLine("Converting " + intList.Count.ToString() + " int list to int array.");
+                int[] intArray = ConvertListOfIntsToArrayOfInts(intList);
+
+
+                //Sort that array of ints and store the data
+                if (selectSort.Validate(intArray))
+                    MessageBox.Show("Error: the array is already sorted.");
+                else
+                {
+                    //sort and time
+                    Debug.WriteLine("Sorting int array");
+                    selectSortTime = getSortingTime(selectSort, sortingTimer, intArray);
+                    //store data
+                    Debug.WriteLine("Storing data.");
+                    selectSort.AddAlgorithmData(new AlgorithmData(selectSort.AlgorithmName, intList.Count, selectSortTime.Milliseconds, 
+                                                                        selectSort.ExchangeCount, selectSort.CompareCount, 
+                                                                        selectSort.ArrayAccessCount));
+                }
+
+            }//close for-each loop
+
+            //Generate datasets
+            Debug.WriteLine("Generating plot data list.");
+            List<cbLibrary.clsDoublePoint> selectSortDataSet = new List<cbLibrary.clsDoublePoint>();
+            Debug.WriteLine("Populating plot data list.");
+            foreach (AlgorithmData ad in selectSort.DataList)
+            {
+                selectSortDataSet.Add(new cbLibrary.clsDoublePoint(ad.SortingListNValue, ad.StopwatchDuration));
+            }
+
+            Debug.WriteLine("Drawing scatterplot.");
+            cbLibrary.DrawScatterplot selectSortScatterplot = new cbLibrary.DrawScatterplot(selectSortDataSet, "SelectSort Dataset");
+            Debug.WriteLine("Draw complete. Returning to main UI thread.");
+
+        }//close btnSortAllIntLists
 
     }//close form class
 
