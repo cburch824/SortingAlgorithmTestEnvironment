@@ -22,9 +22,13 @@ namespace SortingAlgorithmTestEnvironment
             {
                 int min = i;
                 for (int j = i + 1; j < N; j++)
+                {
                     if (Less(sortedArray[j], sortedArray[min]))
                         min = j;
+                    this.ArrayAccessCount++;
+                }
                 Exchange(i, min, sortedArray);
+                this.ArrayAccessCount++;
             }
 
             return sortedArray;

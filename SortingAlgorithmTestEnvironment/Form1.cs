@@ -330,16 +330,21 @@ namespace SortingAlgorithmTestEnvironment
 
             //Generate datasets
             Debug.WriteLine("Generating plot data list.");
-            List<cbLibrary.clsDoublePoint> selectSortDataSet = new List<cbLibrary.clsDoublePoint>();
+            List<cbLibrary.clsDoublePoint> selectSortTimeDataSet = new List<cbLibrary.clsDoublePoint>(); //create a list to hold the data for the "time" analysis
+            List<cbLibrary.clsDoublePoint> selectSortOperationsDataSet = new List<cbLibrary.clsDoublePoint>(); //  create a list to hold the data for the "number of operations" analysis
             Debug.WriteLine("Populating plot data list.");
             foreach (AlgorithmData ad in selectSort.DataList)
             {
-                selectSortDataSet.Add(new cbLibrary.clsDoublePoint(ad.SortingListNValue, ad.StopwatchDuration));
+                selectSortTimeDataSet.Add(new cbLibrary.clsDoublePoint(ad.SortingListNValue, ad.StopwatchDuration));
+                selectSortOperationsDataSet.Add(new cbLibrary.clsDoublePoint(ad.SortingListNValue, ad.ArrayAccessCount));
             }
 
-            Debug.WriteLine("Drawing scatterplot.");
-            cbLibrary.DrawScatterplot selectSortScatterplot = new cbLibrary.DrawScatterplot(selectSortDataSet, "SelectSort Dataset");
-            Debug.WriteLine("Draw complete. Returning to main UI thread.");
+            Debug.WriteLine("Drawing time-based scatterplot.");
+            cbLibrary.DrawScatterplot selectSortTimeScatterplot = new cbLibrary.DrawScatterplot(selectSortTimeDataSet, "SelectSort Time Dataset");
+            Debug.WriteLine("Draw complete.");
+            Debug.WriteLine("Drawing operation-based scatterplot.");
+            cbLibrary.DrawScatterplot selectSortOperationScatterplot = new cbLibrary.DrawScatterplot(selectSortOperationsDataSet, "SelectSort Operations Dataset");
+            Debug.WriteLine("Draw complete. returning to main UI thread.");
 
         }//close btnSortAllIntLists
 
