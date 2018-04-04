@@ -9,15 +9,13 @@ namespace cbLibrary
 {
     class DirectorySearcher
     {
-        /***
-         * ReturnFileNames(string, string) : List<string>
-         * 
-         * This static method takes in a directory and outputs all of the files in that directory, and its subdirectories, to
-         *  a single list of strings.
-         * 
-         * 
-         * 
-         * */
+
+         /// <summary>
+         /// The ReturnFileNames method is a static method which receives a base directory and returns the full filename (and directory) of all files of a specific type within that directory, and all sub directories.
+         /// </summary>
+         /// <param name="inputFolderDirectory">The base directory in which we start the search.</param>
+         /// <param name="fileType">The file type the program is searching for.</param>
+         /// <returns>A list containing the full name of all found files.</returns>
         public static List<string> ReturnFileNames(string inputFolderDirectory, string fileType)
         {
             List<string> outputList = new List<string>(0);
